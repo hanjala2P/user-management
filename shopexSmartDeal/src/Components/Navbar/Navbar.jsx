@@ -1,10 +1,24 @@
-import React from "react";
-import { NavLink } from "react-router";
+import React, { use } from "react";
+import { Link, NavLink } from "react-router";
+import { AuthContext } from "../../Context/AuthContext";
 
 const Navbar = () => {
+  const {user,signOutUser}=use(AuthContext);
+  const handleSignOut =()=>{
+      signOutUser()
+      .then()
+      .catch()
+  }
     const navLinks = <>
    <li><NavLink to='/'>Home</NavLink></li>
    <li><NavLink to='/allProducts'>All Products</NavLink></li>
+
+   {
+    user && <>
+      <li><NavLink to='/myProducts'>My Products</NavLink></li>
+   <li><NavLink to='/MyBids'>My Bids</NavLink></li>
+    </>
+   }
    </>
  
   return (
@@ -36,18 +50,33 @@ const Navbar = () => {
              {navLinks}
             </ul>
           </div>
-          <a className="btn btn-ghost text-xl">Shopex SmartDeals
+          <Link to='/' className="btn btn-ghost font-bold text-xl">Smart <span className="text-primary"> Deals</span>
             
-          </a>
+          </Link>
         </div>
         <div className="navbar-center hidden lg:flex">
           <ul className="menu menu-horizontal px-1">
            {navLinks}
           </ul>
         </div>
-        <div className="navbar-end">
-          <a className="btn">Button</a>
-        </div>
+    <div className="navbar-end gap-3">
+  {user ? (
+    <button onClick={handleSignOut} className='btn btn-primary'>Signout</button>
+  ) : (
+    <>
+      <Link to="/login">
+        <button className="btn border-primary text-primary lg:px-8" type="button">
+          Login
+        </button>
+      </Link>
+      <Link to="/register">
+        <button className="btn lg:px-8 text-white btn-primary" type="button">
+          Register
+        </button>
+      </Link>
+    </>
+  )}
+</div>
       </div>
     </div>
   );

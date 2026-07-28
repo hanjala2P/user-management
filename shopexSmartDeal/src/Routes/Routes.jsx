@@ -1,10 +1,12 @@
 import { createBrowserRouter } from "react-router";
-import Root from "../Layout/RootLayout";
 import RootLayout from "../Layout/RootLayout";
 import Home from "../Components/Home/Home";
 import AllProducts from "../Components/AllProducts/AllProducts";
 import Regsiter from "../Components/Register/Regsiter";
 import Login from "../Components/Login/Login";
+import MyBids from "../Components/MyBids/MyBids";
+import MyProducts from "../Components/MyProducts/MyProducts";
+import ProductDetails from "../Components/ProdcutDetails/ProductDetails";
 
 const router = createBrowserRouter([
     {
@@ -18,6 +20,10 @@ const router = createBrowserRouter([
             { path:'/allProducts', Component: AllProducts },
             { path:'/register', Component:Regsiter },
             { path:'/login', Component:Login},
+            { path:'/myBids', Component:MyBids},
+            { path:'/myProducts', Component:MyProducts},
+            { path: '/productDetails/:id', loader: ({params}) => fetch(`http://localhost:3000/latestProducts/${params.id}`),Component: ProductDetails
+}
         ]
     }
 ])

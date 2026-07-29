@@ -29,15 +29,26 @@ const ProductDetails = () => {
 
   useEffect(() => {
 
-    if (productId) {
-      fetch(`http://localhost:3000/bids?product=${productId}`)
-        .then(res => res.json())
-        .then(data => {
-            console.log('bids for this product', data);
-            setBids(data)
-        });
+    if (productId && user) {
+      user.getIdToken().then(token => {
+        fetch(`http://localhost:3000/bids?product=${productId}`, {
+          headers: {
+            authorization: `Bearer ${token}`
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+              console.log('bids for this product', data);
+              if(Array.isArray(data)){
+                setBids(data)
+              } else {
+                console.error('Expected an array but got:', data);
+                setBids([])
+              }
+          });
+      });
     }
-  }, [productId]);
+  }, [productId, user]);
 
   const handleBidModalOpen = () => {
     bidModalRef.current.showModal();
@@ -298,7 +309,7 @@ const ProductDetails = () => {
               <tr className="text-gray-500 text-sm">
                 <th>SL No</th>
                 <th>Product</th>
-                <th>Seller</th>
+                <th>Buyer</th>
                 <th>Bid Price</th>
                 <th>Actions</th>
               </tr>

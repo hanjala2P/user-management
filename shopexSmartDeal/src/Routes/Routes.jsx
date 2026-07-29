@@ -7,6 +7,7 @@ import Login from "../Components/Login/Login";
 import MyBids from "../Components/MyBids/MyBids";
 import MyProducts from "../Components/MyProducts/MyProducts";
 import ProductDetails from "../Components/ProdcutDetails/ProductDetails";
+import PrivetRoutes from "./PrivetRoutes";
 
 const router = createBrowserRouter([
     {
@@ -17,12 +18,12 @@ const router = createBrowserRouter([
                 index:true,
                 Component:Home
             },
-            { path:'/allProducts', Component: AllProducts },
+            { path:'/allProducts', element:<PrivetRoutes><AllProducts></AllProducts></PrivetRoutes> },
             { path:'/register', Component:Regsiter },
             { path:'/login', Component:Login},
-            { path:'/myBids', Component:MyBids},
-            { path:'/myProducts', Component:MyProducts},
-            { path: '/productDetails/:id', loader: ({params}) => fetch(`http://localhost:3000/latestProducts/${params.id}`),Component: ProductDetails
+            { path:'/myBids', element:<PrivetRoutes><MyBids></MyBids></PrivetRoutes>},
+            { path:'/myProducts', element:<PrivetRoutes><MyProducts></MyProducts></PrivetRoutes>},
+            { path: '/productDetails/:id', loader: ({params}) => fetch(`http://localhost:3000/latestProducts/${params.id}`),element: <PrivetRoutes><ProductDetails></ProductDetails></PrivetRoutes>
 }
         ]
     }

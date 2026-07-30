@@ -16,13 +16,13 @@ const Register = () => {
         const password = form.password.value;
 
         const userInfo = { name, email, imgURL, password };
-        console.log(userInfo);
+        // console.log(userInfo);
     };
 
     const handleGoogleSignIn = () => {
         signInWithGoogle()
             .then((result) => {
-                console.log(result.user);
+                // console.log(result.user);
 
                 const newUser = {
 
@@ -41,7 +41,7 @@ const Register = () => {
                 })
                 .then(res => res.json())
                 .then(data => {
-                    console.log('data after user save',data)
+                    // console.log('data after user save',data)
                 })
             })
             .catch((error) => {

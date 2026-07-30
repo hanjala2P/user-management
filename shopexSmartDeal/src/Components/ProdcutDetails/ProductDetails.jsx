@@ -1,9 +1,11 @@
 import React, { use, useEffect, useRef, useState } from "react";
-import { useLoaderData, Link } from "react-router";
+import { useLoaderData, Link, useNavigate } from "react-router";
 import { AuthContext } from "../../Context/AuthContext";
 import Swal from "sweetalert2";
+import axios from "axios";
 
 const ProductDetails = () => {
+  const navigate = useNavigate()
   const {
     title,
     price_min,
@@ -27,28 +29,37 @@ const ProductDetails = () => {
   const bidModalRef = useRef(null);
   const [bids , setBids]=useState([])
 
-  useEffect(() => {
 
-    if (productId && user) {
-      user.getIdToken().then(token => {
-        fetch(`http://localhost:3000/bids?product=${productId}`, {
-          headers: {
-            authorization: `Bearer ${token}`
-          }
-        })
-          .then(res => res.json())
-          .then(data => {
-              console.log('bids for this product', data);
-              if(Array.isArray(data)){
-                setBids(data)
-              } else {
-                console.error('Expected an array but got:', data);
-                setBids([])
-              }
-          });
-      });
-    }
-  }, [productId, user]);
+  useEffect(()=>{
+    axios.get(`http://localhost:3000/products/bids/${productId}`)
+    .then(data=>{
+      // console.log('after axios get',data);
+      setBids(data.data)
+    })
+  },[productId])
+
+  // useEffect(() => {
+
+  //   if (productId && user) {
+  //     user.getIdToken().then(token => {
+  //       fetch(`http://localhost:3000/bids?product=${productId}`, {
+  //         headers: {
+  //           authorization: `Bearer ${token}`
+  //         }
+  //       })
+  //         .then(res => res.json())
+  //         .then(data => {
+  //             console.log('bids for this product', data);
+  //             if(Array.isArray(data)){
+  //               setBids(data)
+  //             } else {
+  //               console.error('Expected an array but got:', data);
+  //               setBids([])
+  //             }
+  //         });
+  //     });
+  //   }
+  // }, [productId, user]);
 
   const handleBidModalOpen = () => {
     bidModalRef.current.showModal();
@@ -112,12 +123,12 @@ const ProductDetails = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <Link
-        to="/"
-        className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 mb-4"
+      <button
+       onClick={() => navigate(-1)}
+        className="btn btn-outline inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 mb-4"
       >
         ← Back To Products
-      </Link>
+      </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left column */}

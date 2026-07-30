@@ -1,39 +1,56 @@
 import React, { use, useEffect, useState } from 'react';
 import { AuthContext } from '../../Context/AuthContext';
 import Swal from 'sweetalert2';
+import useAxiosSecure from '../../Hooks/useAxiosSecure';
 
 const MyBids = () => {
     const {user} = use(AuthContext);
     const [bids,setBids]= useState([])
+    const axiosSecure =useAxiosSecure();
 
-    useEffect(()=>{
-        if(user?.email){
-            fetch(`http://localhost:3000/bids?email=${user?.email}`,{
-                headers:{
-                    authorization: `Bearer ${localStorage.getItem('token')}`
-                }
-            })
-            .then(res=> res.json())
-            .then(data =>{
-                console.log(data);
-                setBids(data)
-            })
-        }
-
-    },[user?.email])
-
+  useEffect(()=>{
+    axiosSecure.get(`/bids?email=${user?.email}`)
+    .then(data =>{
+      setBids(data.data)
+    })
+  },[user,axiosSecure])
 
     // useEffect(()=>{
     //     if(user?.email){
-    //         fetch(`http://localhost:3000/bids?email=${user.email}`,{
+    //         fetch(`http://localhost:3000/bids?email=${user?.email}`,{
     //             headers:{
-    //                 authorization: `Bearer ${user.accessToken}`
+    //                 authorization: `Bearer ${localStorage.getItem('token')}`
     //             }
     //         })
     //         .then(res=> res.json())
-    //         .then(data =>{
+    //         .then(async data =>{
     //             console.log(data);
-    //             setBids(data)
+
+    //             if(!Array.isArray(data)){
+    //                 console.error('Expected an array but got:', data);
+    //                 setBids([]);
+    //                 return;
+    //             }
+
+    //             // fetch product info (title, image) for each bid so the table shows real data
+    //             const bidsWithProduct = await Promise.all(
+    //                 data.map(async (bid) => {
+    //                     try {
+    //                         const res = await fetch(`http://localhost:3000/products/${bid.product}`);
+    //                         const product = await res.json();
+    //                         return {
+    //                             ...bid,
+    //                             product_title: product?.title,
+    //                             product_image: product?.image,
+    //                         };
+    //                     } catch (err) {
+    //                         console.error('Failed to load product for bid', bid._id, err);
+    //                         return bid;
+    //                     }
+    //                 })
+    //             );
+
+    //             setBids(bidsWithProduct);
     //         })
     //     }
 
@@ -49,23 +66,32 @@ const MyBids = () => {
   cancelButtonColor: "#d33",
   confirmButtonText: "Yes, delete it!"
 }).then((result) => {
-  if (result.isConfirmed) 
+  if (result.isConfirmed)
    {
     fetch(`http://localhost:3000/bids/${_id}`,{
         method:'DELETE'
     })
     .then(res=>res.json())
     .then(data=> {
-        console.log('after dlt', data)
-    })
-     Swal.fire({
-    title: "Deleted!",
-    text: "Your bid has been successfully deleted.",
-    icon: "success"
-  });
-//   remove dlt bid from ui 
-    const remainingBids = bids.filter(bid=> bid._id !==_id);
-    setBids(remainingBids)
+        // console.log('after dlt', data)
+        if(data.deletedCount > 0){
+            Swal.fire({
+                title: "Deleted!",
+                text: "Your bid has been successfully deleted.",
+                icon: "success"
+            });
+
+            // remove deleted bid from ui only after confirmed success
+            const remainingBids = bids.filter(bid=> bid._id !== _id);
+            setBids(remainingBids)
+        } else {
+            Swal.fire({
+                title: "Failed!",
+                text: "Could not delete the bid. Please try again.",
+                icon: "error"
+            });
+        }
+    });
    }
 });
 
@@ -80,39 +106,32 @@ const MyBids = () => {
       <tr>
         <th> #</th>
         <th>Product</th>
-        <th>Seller</th>
         <th>Bid Price</th>
         <th>Status</th>
         <th>Actions</th>
       </tr>
     </thead>
     <tbody>
- 
-     { bids.map(bid => <tr key={bid._id}>
+
+     { bids.map((bid, index) => <tr key={bid._id}>
         <th>
-  
+          {index + 1}
         </th>
         <td>
           <div className="flex items-center gap-3">
             <div className="avatar">
               <div className="mask mask-squircle h-12 w-12">
                 <img
-                  src="https://img.daisyui.com/images/profile/demo/5@94.webp"
-                  alt="Avatar Tailwind CSS Component" />
+                  src={bid?.product_image}
+                  alt={bid?.product_title} />
               </div>
             </div>
             <div>
-              <div className="font-bold">Yancy Tear</div>
-              <div className="text-sm opacity-50">Brazil</div>
+              <div className="font-bold">{bid?.product_title}</div>
             </div>
           </div>
         </td>
-        <td>
-          Wyman-Ledner
-          <br />
-          <span className="badge badge-ghost badge-sm">Community Outreach Specialist</span>
-        </td>
-        <td>{bid?.bid_price}</td>
+        <td>${bid?.bid_price}</td>
         <td>
             {bid?.status === 'pending' ?<div className="badge badge-warning">
                 {bid?.status}
@@ -129,7 +148,7 @@ const MyBids = () => {
     {/* foot */}
   </table>
 </div>
-            
+
         </div>
     );
 };

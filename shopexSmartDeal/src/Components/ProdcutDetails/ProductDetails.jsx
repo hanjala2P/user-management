@@ -1,11 +1,9 @@
 import React, { use, useEffect, useRef, useState } from "react";
-import { useLoaderData, Link, useNavigate } from "react-router";
+import { useLoaderData, useNavigate } from "react-router";
 import { AuthContext } from "../../Context/AuthContext";
 import Swal from "sweetalert2";
-import axios from "axios";
 
 const ProductDetails = () => {
-  const navigate = useNavigate()
   const {
     title,
     price_min,
@@ -26,40 +24,30 @@ const ProductDetails = () => {
   } = useLoaderData();
   
   const { user } = use(AuthContext);
+  const navigate = useNavigate();
   const bidModalRef = useRef(null);
   const [bids , setBids]=useState([])
 
+  useEffect(() => {
 
-  useEffect(()=>{
-    axios.get(`https://shopex-smart-deal-server.vercel.app/products/bids/${productId}`)
-    .then(data=>{
-      // console.log('after axios get',data);
-      setBids(data.data)
-    })
-  },[productId])
-
-  // useEffect(() => {
-
-  //   if (productId && user) {
-  //     user.getIdToken().then(token => {
-  //       fetch(`https://shopex-smart-deal-server.vercel.app/bids?product=${productId}`, {
-  //         headers: {
-  //           authorization: `Bearer ${token}`
-  //         }
-  //       })
-  //         .then(res => res.json())
-  //         .then(data => {
-  //             console.log('bids for this product', data);
-  //             if(Array.isArray(data)){
-  //               setBids(data)
-  //             } else {
-  //               console.error('Expected an array but got:', data);
-  //               setBids([])
-  //             }
-  //         });
-  //     });
-  //   }
-  // }, [productId, user]);
+    if (productId && user) {
+      fetch(`http://localhost:3000/bids?product=${productId}`, {
+        headers: {
+          authorization: `Bearer ${localStorage.getItem('token')}`
+        }
+      })
+        .then(res => res.json())
+        .then(data => {
+            console.log('bids for this product', data);
+            if(Array.isArray(data)){
+              setBids(data)
+            } else {
+              console.error('Expected an array but got:', data);
+              setBids([])
+            }
+        });
+    }
+  }, [productId, user]);
 
   const handleBidModalOpen = () => {
     bidModalRef.current.showModal();
@@ -86,7 +74,7 @@ const ProductDetails = () => {
         status: 'pending'
     };
 
-    fetch('https://shopex-smart-deal-server.vercel.app/bids', {
+    fetch('http://localhost:3000/bids', {
         method: 'POST',
         headers: {
             'content-type': 'application/json'
@@ -124,8 +112,8 @@ const ProductDetails = () => {
   return (
     <div className="max-w-6xl mx-auto p-6">
       <button
-       onClick={() => navigate(-1)}
-        className="btn btn-outline inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 mb-4"
+        onClick={() => navigate(-1)}
+        className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-800 mb-4"
       >
         ← Back To Products
       </button>
@@ -310,11 +298,53 @@ const ProductDetails = () => {
 
       {/* Bids for this product */}
       <section className="mt-12">
-        <h3 className="font-bold text-4xl mb-6">
+        <h3 className="font-bold text-2xl sm:text-3xl md:text-4xl mb-6">
           Bids For This Product: <span className="text-primary">{bids.length < 10 ? `0${bids.length}` : bids.length}</span>
         </h3>
 
-        <div className="bg-white rounded-xl shadow-sm overflow-x-auto">
+        {/* Mobile card view */}
+        <div className="grid gap-4 md:hidden">
+          {bids.map((bid, index) => (
+            <div key={bid._id} className="bg-white rounded-xl shadow-sm p-4">
+              <div className="flex items-center gap-3 mb-3">
+                <img
+                  src={image}
+                  alt={title}
+                  className="w-12 h-12 rounded-md object-cover bg-gray-200"
+                />
+                <div className="flex-1">
+                  <p className="font-medium">{title}</p>
+                  <p className="text-xs text-gray-400">${price_min}</p>
+                </div>
+                <p className="font-medium">${bid.bid_price}</p>
+              </div>
+
+              <div className="flex items-center gap-3 mb-3 pt-3 border-t border-gray-100">
+                <img
+                  src={bid.buyer_image}
+                  alt={bid.buyer_name}
+                  className="w-8 h-8 rounded-full object-cover bg-gray-200"
+                />
+                <div>
+                  <p className="font-medium text-sm">{bid.buyer_name}</p>
+                  <p className="text-xs text-gray-400">{bid.buyer_email}</p>
+                </div>
+              </div>
+
+              <div className="flex gap-2">
+                <button className="btn btn-xs btn-outline btn-success flex-1">
+                  Accept Offer
+                </button>
+                <button className="btn btn-xs btn-outline btn-error flex-1">
+                  Reject Offer
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Table view for md+ screens */}
+        <div className="hidden md:block bg-white rounded-xl shadow-sm overflow-x-auto">
           <table className="table w-full">
             <thead>
               <tr className="text-gray-500 text-sm">

@@ -31,7 +31,7 @@ const ProductDetails = () => {
   useEffect(() => {
 
     if (productId && user) {
-      fetch(`http://localhost:3000/bids?product=${productId}`, {
+      fetch(`https://shopex-smart-deal-server.vercel.app/bids?product=${productId}`, {
         headers: {
           authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -56,7 +56,7 @@ const ProductDetails = () => {
   const handleBidModalClose = () => bidModalRef.current?.close();
 
   const handleBidStatusUpdate = (bidId, newStatus) => {
-    fetch(`http://localhost:3000/bids/${bidId}`, {
+    fetch(`https://shopex-smart-deal-server.vercel.app/bids/${bidId}`, {
       method: 'PATCH',
       headers: {
         'content-type': 'application/json',
@@ -116,7 +116,7 @@ const ProductDetails = () => {
         status: 'pending'
     };
 
-    fetch('http://localhost:3000/bids', {
+    fetch('https://shopex-smart-deal-server.vercel.app/bids', {
         method: 'POST',
         headers: {
             'content-type': 'application/json'

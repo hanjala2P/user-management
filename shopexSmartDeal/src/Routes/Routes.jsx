@@ -25,7 +25,7 @@ const router = createBrowserRouter([
             { path:'/myBids', element:<PrivetRoutes><MyBids></MyBids></PrivetRoutes>},
             { path:'/createAProduct', element:<PrivetRoutes><CreateAProduct></CreateAProduct></PrivetRoutes>},
             { path:'/myProducts', element:<PrivetRoutes><MyProducts></MyProducts></PrivetRoutes>},
-            { path: '/productDetails/:id', loader: ({params}) => fetch(`http://localhost:3000/latestProducts/${params.id}`),element: <PrivetRoutes><ProductDetails></ProductDetails></PrivetRoutes>
+            { path: '/productDetails/:id', loader: ({params}) => fetch(`https://shopex-smart-deal-server.vercel.app/latestProducts/${params.id}`),element: <PrivetRoutes><ProductDetails></ProductDetails></PrivetRoutes>
 }
         ]
     }

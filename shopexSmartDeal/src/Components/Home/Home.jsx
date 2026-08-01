@@ -1,10 +1,17 @@
-
 import { BsSearch } from "react-icons/bs";
 import LatestProducts from "../LatesProducts/LatestProducts";
-import { Suspense } from "react";
+import { Suspense, useMemo } from "react";
+import { Link } from "react-router";
+
 const Home = () => {
-  const latestProductsPromise = fetch('http://localhost:3000/latestProducts')
-.then(res => res.json());
+  // useMemo keeps the same promise across re-renders — creating a new
+  // fetch promise on every render breaks the `use()` hook in LatestProducts
+  // (it keeps re-suspending, which is why Recent Products wasn't showing).
+  const latestProductsPromise = useMemo(
+    () => fetch('https://shopex-smart-deal-server.vercel.app/latestProducts').then(res => res.json()),
+    []
+  );
+
   return (
     <main className="">
       <section className="flex flex-col mt-6 gap-6 text-center items-center">
@@ -18,8 +25,8 @@ const Home = () => {
             <button className="btn border-none rounded-l-none  bg-primary text-white"><BsSearch></BsSearch></button>
         </div>
         <div className="flex gap-6">
-            <button className="bg-primary text-white btn">Watch All Products</button>
-            <button className="btn text-primary border-primary">Post an Products</button>
+            <Link to="/allProducts" className="bg-primary text-white btn">Watch All Products</Link>
+            <Link to="/createAProduct" className="btn text-primary border-primary">Post an Products</Link>
         </div>
       </section>
       {/* latest products cards sections */}

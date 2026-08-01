@@ -31,7 +31,7 @@ const ProductDetails = () => {
 
 
   useEffect(()=>{
-    axios.get(`http://localhost:3000/products/bids/${productId}`)
+    axios.get(`https://shopex-smart-deal-server.vercel.app/products/bids/${productId}`)
     .then(data=>{
       // console.log('after axios get',data);
       setBids(data.data)
@@ -42,7 +42,7 @@ const ProductDetails = () => {
 
   //   if (productId && user) {
   //     user.getIdToken().then(token => {
-  //       fetch(`http://localhost:3000/bids?product=${productId}`, {
+  //       fetch(`https://shopex-smart-deal-server.vercel.app/bids?product=${productId}`, {
   //         headers: {
   //           authorization: `Bearer ${token}`
   //         }
@@ -86,7 +86,7 @@ const ProductDetails = () => {
         status: 'pending'
     };
 
-    fetch('http://localhost:3000/bids', {
+    fetch('https://shopex-smart-deal-server.vercel.app/bids', {
         method: 'POST',
         headers: {
             'content-type': 'application/json'

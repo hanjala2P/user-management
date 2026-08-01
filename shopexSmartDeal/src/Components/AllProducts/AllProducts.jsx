@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router';
+import Swal from 'sweetalert2';
 
 const AllProducts = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        fetch('http://localhost:3000/products')
+        fetch('https://shopex-smart-deal-server.vercel.app/products')
             .then(res => res.json())
             .then(data => {
                 if (Array.isArray(data)) {
@@ -19,6 +20,11 @@ const AllProducts = () => {
             .catch(err => {
                 console.error('Failed to load products', err);
                 setProducts([]);
+                Swal.fire({
+                    icon: "error",
+                    title: "Failed to load products",
+                    text: "Please check your connection and try again."
+                });
             })
             .finally(() => setLoading(false));
     }, []);

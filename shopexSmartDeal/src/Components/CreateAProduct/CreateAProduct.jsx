@@ -38,11 +38,9 @@ const CreateAProduct = () => {
             created_at: new Date().toISOString(),
             status: 'available',
         }
-        // console.log(newProduct)
 
         axiosSecure.post('/products', newProduct)
         .then(res => {
-            // console.log('after secure data', res.data);
             if(res.data.insertedId){
                 Swal.fire({
                   position: "top-end",
@@ -55,7 +53,7 @@ const CreateAProduct = () => {
             }
         })
         .catch(err => {
-            console.error('Failed to add product', err);
+            // console.error('Failed to add product', err);
             Swal.fire({
                 icon: "error",
                 title: "Failed to add product",
@@ -66,11 +64,11 @@ const CreateAProduct = () => {
 
 
     return (
-        <div>
-            <h2 className='text-center font-bold text-3xl mt-8'>Create a Product</h2>
+        <div className="px-4">
+            <h2 className='text-center font-bold text-2xl sm:text-3xl mt-8'>Create a Product</h2>
             <div className='w-12 bg-primary h-2 rounded mx-auto mt-4'></div>
-            <section className='w-4xl outline outline-primary mx-auto  mb-12 mt-12 px-16 py-18 bg-white rounded-2xl shadow-2xl'>
-                <p className='text-center mb-12 text-lg font-medium'>Product Details form</p>
+            <section className='w-full max-w-2xl outline outline-primary mx-auto mb-12 mt-12 px-6 py-10 sm:px-10 sm:py-14 lg:px-16 lg:py-18 bg-white rounded-2xl shadow-2xl'>
+                <p className='text-center mb-8 sm:mb-12 text-lg font-medium'>Product Details form</p>
                               <form onSubmit={handleCreateAProduct} className="space-y-4">
                 <div className="flex flex-col sm:flex-row gap-4">
                   <div className="w-full">
@@ -113,7 +111,7 @@ const CreateAProduct = () => {
                     required
                   />
                 </div>
-                <div className='flex justify-between gap-3'>
+                <div className='flex flex-col sm:flex-row justify-between gap-3'>
                         <div className="w-full">
                     <label htmlFor="price_min" className="label">
                       <span className="label-text">Price min</span>
@@ -140,7 +138,7 @@ const CreateAProduct = () => {
                   </div>
                 </div>
 
-                <div className='flex justify-between gap-3'>
+                <div className='flex flex-col sm:flex-row justify-between gap-3'>
                   <div className="w-full">
                     <label htmlFor="location" className="label">
                       <span className="label-text">Location</span>

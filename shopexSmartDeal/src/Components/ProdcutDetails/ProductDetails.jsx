@@ -55,6 +55,48 @@ const ProductDetails = () => {
 
   const handleBidModalClose = () => bidModalRef.current?.close();
 
+  const handleBidStatusUpdate = (bidId, newStatus) => {
+    fetch(`http://localhost:3000/bids/${bidId}`, {
+      method: 'PATCH',
+      headers: {
+        'content-type': 'application/json',
+        authorization: `Bearer ${localStorage.getItem('token')}`
+      },
+      body: JSON.stringify({ status: newStatus })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.modifiedCount > 0) {
+          Swal.fire({
+            position: "top-end",
+            icon: "success",
+            title: newStatus === 'accepted' ? "Offer accepted" : "Offer rejected",
+            showConfirmButton: false,
+            timer: 1500
+          });
+
+          const updatedBids = bids.map(bid =>
+            bid._id === bidId ? { ...bid, status: newStatus } : bid
+          );
+          setBids(updatedBids);
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Failed to update bid",
+            text: "Please try again."
+          });
+        }
+      })
+      .catch(err => {
+        console.error('Failed to update bid status:', err);
+        Swal.fire({
+          icon: "error",
+          title: "Failed to update bid",
+          text: "Could not reach the server. Please check your connection and try again."
+        });
+      });
+  };
+
   const handleBidSubmit = (e) => {
     e.preventDefault();
 
@@ -83,6 +125,7 @@ const ProductDetails = () => {
     })
     .then(res => res.json())
     .then(data => {
+        console.log('bid submit response', data);
         if(data.insertedId){
             bidModalRef.current.close();
             Swal.fire({
@@ -98,8 +141,22 @@ const ProductDetails = () => {
             const newBids =[...bids,newBid];
             newBids.sort((a,b)=> b.bid_price - a.bid_price);
             setBids(newBids)
-
+        } else {
+            console.error('Bid was not inserted, response was:', data);
+            Swal.fire({
+                icon: "error",
+                title: "Failed to place bid",
+                text: data?.message || "Please try again."
+            });
         }
+    })
+    .catch(err => {
+        console.error('Bid submit failed:', err);
+        Swal.fire({
+            icon: "error",
+            title: "Failed to place bid",
+            text: "Could not reach the server. Please check your connection and try again."
+        });
     });
   };
 
@@ -332,12 +389,28 @@ const ProductDetails = () => {
               </div>
 
               <div className="flex gap-2">
-                <button className="btn btn-xs btn-outline btn-success flex-1">
-                  Accept Offer
-                </button>
-                <button className="btn btn-xs btn-outline btn-error flex-1">
-                  Reject Offer
-                </button>
+                {bid.status === 'accepted' ? (
+                  <div className="badge badge-success flex-1 py-3">Accepted</div>
+                ) : bid.status === 'rejected' ? (
+                  <div className="badge badge-error flex-1 py-3">Rejected</div>
+                ) : user?.email === email ? (
+                  <>
+                    <button
+                      onClick={() => handleBidStatusUpdate(bid._id, 'accepted')}
+                      className="btn btn-xs btn-outline btn-success flex-1"
+                    >
+                      Accept Offer
+                    </button>
+                    <button
+                      onClick={() => handleBidStatusUpdate(bid._id, 'rejected')}
+                      className="btn btn-xs btn-outline btn-error flex-1"
+                    >
+                      Reject Offer
+                    </button>
+                  </>
+                ) : (
+                  <div className="badge badge-ghost flex-1 py-3">Pending</div>
+                )}
               </div>
             </div>
           ))}
@@ -392,12 +465,28 @@ const ProductDetails = () => {
 
                   <td>
                     <div className="flex gap-2">
-                      <button className="btn btn-xs btn-outline btn-success">
-                        Accept Offer
-                      </button>
-                      <button className="btn btn-xs btn-outline btn-error">
-                        Reject Offer
-                      </button>
+                      {bid.status === 'accepted' ? (
+                        <div className="badge badge-success">Accepted</div>
+                      ) : bid.status === 'rejected' ? (
+                        <div className="badge badge-error">Rejected</div>
+                      ) : user?.email === email ? (
+                        <>
+                          <button
+                            onClick={() => handleBidStatusUpdate(bid._id, 'accepted')}
+                            className="btn btn-xs btn-outline btn-success"
+                          >
+                            Accept Offer
+                          </button>
+                          <button
+                            onClick={() => handleBidStatusUpdate(bid._id, 'rejected')}
+                            className="btn btn-xs btn-outline btn-error"
+                          >
+                            Reject Offer
+                          </button>
+                        </>
+                      ) : (
+                        <div className="badge badge-ghost">Pending</div>
+                      )}
                     </div>
                   </td>
                 </tr>

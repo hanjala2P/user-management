@@ -15,7 +15,6 @@ const MyBids = () => {
             const data = res.data;
 
             if(!Array.isArray(data)){
-                // console.error('Expected an array but got:', data);
                 setBids([]);
                 return;
             }
@@ -26,14 +25,12 @@ const MyBids = () => {
                     try {
                         const productRes = await axiosSecure.get(`/products/${bid.product}`);
                         const product = productRes.data;
-                        // console.log('bid.product id:', bid.product, '-> product response:', JSON.stringify(product));
                         return {
                             ...bid,
                             product_title: product?.title,
                             product_image: product?.image,
                         };
                     } catch (err) {
-                        // console.error('Failed to load product for bid', bid._id, 'product id used:', bid.product, err);
                         return bid;
                     }
                 })
@@ -59,7 +56,6 @@ const MyBids = () => {
    {
     axiosSecure.delete(`/bids/${_id}`)
     .then(res=> {
-        console.log('after dlt', res.data)
         if(res.data.deletedCount > 0){
             Swal.fire({
                 title: "Deleted!",
@@ -95,28 +91,26 @@ const MyBids = () => {
             <h2 className="text-xl sm:text-2xl font-bold mb-4">my bids : { bids.length}</h2>
 
             {/* Mobile card view */}
-            <div className="grid gap-4 md:hidden">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 md:hidden">
                 {bids.map((bid) => (
-                    <div key={bid._id} className="bg-white rounded-xl shadow-sm p-4">
-                        <div className="flex items-center gap-3 mb-3">
-                            <div className="avatar">
-                                <div className="mask mask-squircle h-14 w-14">
-                                    <img src={bid?.product_image} alt={bid?.product_title} />
-                                </div>
-                            </div>
-                            <div className="flex-1">
-                                <div className="font-bold">{bid?.product_title}</div>
-                                <div className="text-sm text-gray-500">${bid?.bid_price}</div>
-                            </div>
+                    <div key={bid._id} className="bg-white rounded-xl shadow-sm p-3 flex flex-col">
+                        <img
+                            src={bid?.product_image}
+                            alt={bid?.product_title}
+                            className="w-full h-28 object-cover rounded-lg bg-gray-200 mb-2"
+                        />
+                        <div className="font-bold text-sm mb-1 line-clamp-1">{bid?.product_title}</div>
+                        <div className="flex items-center justify-between mb-2">
+                            <span className="text-sm text-gray-500">${bid?.bid_price}</span>
                             {bid?.status === 'pending' ? (
-                                <div className="badge badge-warning">{bid?.status}</div>
+                                <div className="badge badge-warning badge-sm">{bid?.status}</div>
                             ) : (
-                                <div className="badge badge-success">{bid?.status}</div>
+                                <div className="badge badge-success badge-sm">{bid?.status}</div>
                             )}
                         </div>
                         <button
                             onClick={() => handleDlt(bid?._id)}
-                            className="btn btn-outline btn-xs w-full"
+                            className="btn btn-outline btn-xs w-full mt-auto"
                         >
                             Remove
                         </button>
@@ -144,17 +138,13 @@ const MyBids = () => {
           {index + 1}
         </th>
         <td>
-          <div className="flex items-center gap-3">
-            <div className="avatar">
-              <div className="mask mask-squircle h-12 w-12">
-                <img
-                  src={bid?.product_image}
-                  alt={bid?.product_title} />
-              </div>
-            </div>
-            <div>
-              <div className="font-bold whitespace-nowrap">{bid?.product_title}</div>
-            </div>
+          <div className="flex flex-col items-start gap-2 py-2">
+            <img
+              src={bid?.product_image}
+              alt={bid?.product_title}
+              className="w-16 h-16 rounded-md object-cover bg-gray-200"
+            />
+            <div className="font-bold whitespace-nowrap">{bid?.product_title}</div>
           </div>
         </td>
         <td className="whitespace-nowrap">${bid?.bid_price}</td>
